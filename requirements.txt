@@ -1,0 +1,6 @@
+# Modules
+flask
+pandas
+oauth2client
+gspread
+psycopg2
