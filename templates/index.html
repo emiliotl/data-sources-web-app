@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Sources App</title>
+</head>
+<body>
+    <div id="form">
+        <form id="formElementDataFrame" hidden>
+            <label for="time">Time: </label><input type="text" id="time" name="time" placeholder="2000.0"><br>
+            <label for="value">Value: </label><input type="text" id="value" name="value" placeholder="100"><br>
+            <input type="submit" value="Post to DataFrame">
+        </form>
+        <form id="formElementDatabase" hidden>
+            <label for="first_name">First Name: </label><input type="text" id="first_name" name="first_name" placeholder="John"><br>
+            <label for="last_name">Last Name: </label><input type="text" id="last_name" name="last_name" placeholder="Doe"><br>
+            <input type="submit" value="Post to Database">
+        </form>
+        <form id="formElementGoogleDrive" hidden>
+            <label for="product">Product: </label><input type="text" id="product" name="product" placeholder="Tool"><br>
+            <label for="count">Count: </label><input type="text" id="count" name="count" placeholder="10"><br>
+            <input type="submit" value="Post to Google Spreadsheet">
+        </form>
+     </div>
+    <div id="result"></div>
+    <script type="text/javascript" src="data_source_front_end.js"></script>
+</body>
+</html>

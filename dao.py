@@ -8,7 +8,7 @@ class CursorFromConnection:
 
     def __enter__(self):
         self.connection = psycopg2.connect(
-            host="localhost",
+            host="",
             database="",
             user="",
             password=""
@@ -25,12 +25,12 @@ class CursorFromConnection:
         self.connection.close()
 
 
-def query_to_insert_data(query):
+def query_to_insert_data(query, *args):
     with CursorFromConnection() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, *args)
 
 
-def query_to_select_data(query):
+def query_to_select_data(query, *args):
     with CursorFromConnection() as cursor:
-        cursor.execute(query)
+        cursor.execute(query, *args)
         return [row[0] for row in cursor.fetchall()]
