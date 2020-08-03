@@ -3,9 +3,9 @@
 let formElem = null;
 let endPointSource = null;
 
-if (document.URL.includes("dataframe")) {
+if (document.URL.includes("data_frame")) {
     formElem = document.getElementById("formElementDataFrame");
-    endPointSource = "dataframe";
+    endPointSource = "data_frame";
 } else if (document.URL.includes("database")) {
     formElem = document.getElementById("formElementDatabase");
     endPointSource = "database";

@@ -1,18 +1,8 @@
 from flask import Flask, request, render_template
-from pandas import read_csv
-from oauth2client.service_account import ServiceAccountCredentials
-import gspread
+from data_sources.dao import DataAccessObjectFactory
 
-import dao
 
 app = Flask(__name__, static_url_path='', static_folder='templates')
-data_frame = read_csv('kaggle_data/AirPassengers.csv')
-creds = ServiceAccountCredentials.from_json_keyfile_name(
-    '',
-    ['https://spreadsheets.google.com/feeds',
-     'https://www.googleapis.com/auth/drive']
-)
-sheet = gspread.authorize(creds).open("Sample").sheet1
 
 
 @app.route('/')
@@ -20,8 +10,10 @@ def home_page():
     return "Welcome"
 
 
-@app.route('/get_dataframe_data', methods=['GET'])
+@app.route('/get_data_frame_data', methods=['GET'])
 def get_pandas_data():
+    data_frame_factory = DataAccessObjectFactory("DataFrame")
+    data_frame = data_frame_factory.get_data_access_object()
     return {
         index: value for (index, value) in
         data_frame[request.args['column']][:int(request.args['rows'])].items()
@@ -30,9 +22,11 @@ def get_pandas_data():
 
 @app.route('/get_database_data', methods=['GET'])
 def get_database_data():
+    database_factory = DataAccessObjectFactory('Database')
+    database = database_factory.get_data_access_object()
     return {
         index: value for (index, value) in
-        enumerate(dao.query_to_select_data(
+        enumerate(database.query_to_select_data(
             f'select last_name from actor limit %(rows)s',
             {"rows": request.args["rows"]}))
     }
@@ -40,6 +34,8 @@ def get_database_data():
 
 @app.route('/get_drive_data', methods=['GET'])
 def get_drive_data():
+    spread_sheet_factory = DataAccessObjectFactory("SpreadSheet")
+    sheet = spread_sheet_factory.get_data_access_object()
     if request.args:
         return {
             index: value for (index, value) in
@@ -53,14 +49,16 @@ def get_drive_data():
 
 
 @app.route('/post_form', methods=['GET'])
-def post_dataframe_form():
+def post_form():
     return render_template('index.html')
 
 
-@app.route('/post_dataframe', methods=['POST'])
-def post_to_dataframe():
+@app.route('/post_data_frame', methods=['POST'])
+def post_to_data_frame():
+    data_frame_factory = DataAccessObjectFactory('DataFrame')
+    data_frame = data_frame_factory.get_data_access_object()
     form_data = {key: eval(value) for (key, value) in
-                   request.values.dicts[1].items()}
+                 request.values.dicts[1].items()}
     data_frame.loc[len(data_frame)] = [
         str(len(data_frame) + 1),
         form_data['time'],
@@ -70,9 +68,11 @@ def post_to_dataframe():
 
 @app.route('/post_database', methods=['POST'])
 def post_to_database():
+    database_factory = DataAccessObjectFactory('Database')
+    database = database_factory.get_data_access_object()
     form_data = {key: value for (key, value) in
                  request.values.dicts[1].items()}
-    dao.query_to_insert_data(
+    database.query_to_insert_data(
         f'insert into actor (first_name, last_name) '
         f'values (%(first)s, %(last)s)',
         {"first": form_data['first_name'], "last": form_data['last_name']})
@@ -81,6 +81,8 @@ def post_to_database():
 
 @app.route('/post_drive', methods=['POST'])
 def post_to_drive():
+    spread_sheet_factory = DataAccessObjectFactory('SpreadSheet')
+    sheet = spread_sheet_factory.get_data_access_object()
     form_data = {key: value for (key, value) in
                  request.values.dicts[1].items()}
     sheet.insert_row(
